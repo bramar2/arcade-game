@@ -11,7 +11,10 @@ On root, run the following commands:
 - `cmake --build build/`
 
 
-The executable should be in build/arcade-game.exe.
+The executable should be in build/arcade-game.exe. Make sure you have SDL3 and SDL3_ttf installed.
 
 ## Preview
 Note that the preview does use copyrighted materials. The preview is meant for demonstrational purposes only. The owner does not condone the use of copyrighted materials.
+
+https://github.com/user-attachments/assets/ec1eedfb-9206-4c75-a408-b117f02dca2c
+
