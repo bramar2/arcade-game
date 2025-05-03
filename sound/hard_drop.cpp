@@ -27,6 +27,7 @@ namespace Sound {
 	}
 
 	void play_hard_drop() {
+		SDL_ClearAudioStream(audioStream);
 		SDL_PutAudioStreamData(audioStream, adjusted_wav_buffer, wav_length);
 	}
 
