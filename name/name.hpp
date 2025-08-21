@@ -3,6 +3,6 @@
 #include <string>
 
 namespace Name {
-	const std::string NAME = "ArcadeGame";
-	const std::string NAME_CAPS = "ARCADEGAME";
+	const std::string NAME = "Tetris";
+	const std::string NAME_CAPS = "TETRIS";
 }

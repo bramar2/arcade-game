@@ -88,6 +88,10 @@ namespace Ui {
 		retryText = TTF_CreateText(textEngine, Font1::sz24, "RETRY", 0);
 		TTF_SetTextColor(retryText, 255, 255, 255, 255);
 		TTF_GetStringSize(Font1::sz24, "RETRY", 0, &retryTextSize[0], &retryTextSize[1]);
+
+		levelUpText = TTF_CreateText(textEngine, Font1::sz36, "LEVEL UP", 0);
+		TTF_SetTextColor(levelUpText, 255, 255, 255, 255);
+		TTF_GetStringSize(Font1::sz36, "LEVEL UP", 0, &levelUpTextSize[0], &levelUpTextSize[1]);
 	}
 
 	void Game::open() {
@@ -98,17 +102,17 @@ namespace Ui {
 		retryUi = false;
 		frameDurations = std::deque<Uint64>(frameDurationsSz, 0);
 		frameDurationSum = 0;
-
-
-		// testing
-		// std::copy(&Test::mini_t_spin_single::grid[0][0], &Test::mini_t_spin_single::grid[0][0] + sizeof(grid) / sizeof(grid[0][0]), &grid[0][0]);
-		// nextPieceTypes.push_front(Test::mini_t_spin_single::piece);
-
-
 		dataLines = 0;
 		dataScore = 0;
 		combo = -1;
 		btbDifficult = btb4CPerfectClear = false;
+
+		left_pressed = false;
+		right_pressed = false;
+		down_pressed = false;
+		up_pressed = false;
+		z_pressed = false;
+		space_pressed = false;
 
 		Sound::start_theme();
 		new_block();
@@ -181,6 +185,19 @@ namespace Ui {
 		}
 
 		SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+
+		if(levelUp) {
+			int show = ((tick - levelUpTime) / levelUpEachGlow) % 2 == 0;
+			if(show) {
+				TTF_DrawRendererText(levelUpText, mainBox.x + mainBox.w / 2.0f - levelUpTextSize[0] / 2.0f,
+					mainBox.y + 32);
+			}
+			if(tick - levelUpTime >= levelUpShowTime) {
+				levelUp = false;
+			}
+		}
+
+		prompt_tick();
 
 		mainBox = {
 			side - rEps, vertMargin - rEps, 10*each + 2 * rEps, 20*each + 2 * rEps
@@ -394,11 +411,17 @@ namespace Ui {
 	}
 
 	void Game::destroy() {
+		for(const auto& [str, _, __, ___] : scorePromptQueue) {
+			TTF_DestroyText(str);
+		}
+		scorePromptQueue.clear();
+
 		TTF_DestroyText(nextText);
 		TTF_DestroyText(holdText);
 		TTF_DestroyText(levelText);
 		TTF_DestroyText(scoreText);
 		TTF_DestroyText(linesText);
+		TTF_DestroyText(levelUpText);
 	}
 
 	void Game::key_tick() {
@@ -662,8 +685,29 @@ namespace Ui {
 		}
 	}
 
-	void prompt(std::string str) {
-		SDL_Log("Score: %s", str.data());
+	void Game::prompt(const std::string& str) {
+		TTF_Text* text = TTF_CreateText(textEngine, Font1::sz18, str.data(), 0);
+		int textW, textH;
+		TTF_GetStringSize(Font1::sz18, str.data(), 0, &textW, &textH);
+
+		scorePromptQueue.push_front(
+			{text, promptX, promptY, SDL_GetTicks() + scorePromptTime}
+		);
+		promptY -= (textH + 8);
+	}
+
+	void Game::prompt_tick() {
+		Uint64 tick = SDL_GetTicks();
+		while(!scorePromptQueue.empty() && std::get<Uint64>(scorePromptQueue.front()) < tick) {
+			TTF_DestroyText(std::get<TTF_Text*>(scorePromptQueue.front()));
+			scorePromptQueue.pop_front();
+		}
+		for(auto& [str, x, y, end] : scorePromptQueue) {
+			int elapsed = scorePromptTime - (end - tick);
+			int opacity = std::min<int>(255, 255 - 255 * elapsed / scorePromptTime);
+			TTF_SetTextColor(str, 255, 255, 255, opacity);
+			TTF_DrawRendererText(str, x, y);
+		}
 	}
 
 	void Game::whoosh() {
@@ -677,14 +721,29 @@ namespace Ui {
 			}
 		}
 
+		SDL_FRect mainBox {
+			side, vertMargin, w - 2 * side, h - 2 * vertMargin
+		};
+		int r = currentPiece[0][0], c = currentPiece[0][1];
+		const float each = std::min(
+			mainBox.w / 10.0,
+			mainBox.h / 20.0
+		);
+		promptX = side + c * each;
+		promptY = vertMargin + r * each;
+
+
+
 		int clearedCount = std::count(std::begin(full), std::end(full), true);
-		
-		dataScore += Scoring::calculate(prompt, grid, full, dataLevel, tSpin, combo, btbDifficult, btb4CPerfectClear);
+
+		dataScore += Scoring::calculate([&](const std::string& str) -> void { prompt(str); }, grid, full, dataLevel, tSpin, combo, btbDifficult, btb4CPerfectClear);
 		dataLines += clearedCount;
 
 		if(dataLevel != 1 + (dataLines / levelLines)) {
 			// level up
 			dataLevel = 1 + (dataLines / 10);
+			levelUp = true;
+			levelUpTime = SDL_GetTicks();
 		}
 
 		if(clearedCount == 4) {

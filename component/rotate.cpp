@@ -12,9 +12,9 @@
 /*
  Implementation uses the SRS standard (Super Rotation System),
  which is the current standard guideline for piece rotations.
- All information is from https://{arcadegame}.wiki/Super_Rotation_System
+ All information is from https://tetris.wiki/Super_Rotation_System
 
- T-spin checks are also in Rotate.cpp (https://{arcadegame}.wiki/T-Spin)
+ T-spin checks are also in Rotate.cpp (https://tetris.wiki/T-Spin)
  T-spin = True if:
  - 3/4 squares diagonally adjacent to T's center are occupied
  - 2 front, 1-2 back => T-spin

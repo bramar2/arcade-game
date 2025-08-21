@@ -14,7 +14,9 @@
 #include "name/name.hpp"
 #include "settings/settings.hpp"
 #include "sound/setup.hpp"
+
 #include "text/f1.hpp"
+#include "text/f2.hpp"
 
 #include <SDL3_ttf/SDL_ttf.h>
 #include <SDL3/SDL.h>
@@ -69,9 +71,11 @@ void app_init() {
     SDL_SetWindowIcon(window, Logo::windowSurface);
     Logo::destroy_window();
 
+    Font1::init();
+    Font2::init();
+
     Logo::init(renderer);
     Sound::init();
-    Font1::init();
     Cursor::init();
 
     Block::Blue::init(renderer);
@@ -87,6 +91,7 @@ void app_init() {
     }
 
     Settings::init(renderer, "settings.json");
+    Settings::update();
 
     app_render();
 }
@@ -131,9 +136,11 @@ void app_eventloop() {
 
 void app_quit() {
 
+	Font1::destroy();
+	Font2::destroy();
+
 	Logo::destroy();
 	Sound::destroy();
-	Font1::destroy();
 	Cursor::destroy();
 
 	Block::Blue::destroy();

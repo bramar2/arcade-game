@@ -1,5 +1,6 @@
 #pragma once
 
+#include "SDL3/SDL_keycode.h"
 #include "base.hpp"
 
 #include <SDL3/SDL_render.h>
@@ -12,6 +13,15 @@
 namespace Ui {
 	class Main : public Base {
 	private:
+		const std::string CREDITS = R"(Credits & Attribution:
+SDL - library for audio and display
+Nintendo - idea, sprites, music, sfx
+UXWing - icons
+CodeMan38 - arcade font "Press Start 2P"
+GNU - font "FreeMono"
+bramar2 - ui/ux, code, data,
+              logic, game mechanics)";
+		const std::string GITHUB_LINK = "https://github.com/bramar2/arcade-game";
 		const int w = 840, h = 840;
 		const int overlayAlpha = 128;
 		const int settingHoverOverlayAlpha = 100;
@@ -26,10 +36,16 @@ namespace Ui {
 		TTF_Text* playText;
 		TTF_Text* hsText;
 		TTF_Text* noneText;
+		TTF_Text* exitText;
+		TTF_Text* creditsText;
+		TTF_Text* linkText;
+
 
 		float logoWidth, logoHeight;
 		int tw, th, tx, ty;
 		int hsW;
+		int creditsHeight;
+		int linkWidth, linkHeight;
 
 		SDL_FRect settingBtnRect;
 		SDL_FRect logoPos;
@@ -47,6 +63,7 @@ namespace Ui {
 		void init(SDL_Window* window, SDL_Renderer* renderer, TTF_TextEngine* textEngine, const SwitchFunc& funcSwitchUi) override;
 		void render() override;
 		void mousedown(Uint8 button) override;
+		void keydown(SDL_Keycode keycode) override;
 		void destroy() override;
 
 		TTF_Text* setting_text(const std::string& str, int r = 160, int g = 160, int b = 160);

@@ -3,6 +3,7 @@
 #include "game.hpp"
 #include "../logo/logo.hpp"
 #include "../text/f1.hpp"
+#include "../text/f2.hpp"
 #include "../cursor/cursor.hpp"
 #include "../settings/icon.hpp"
 #include "../settings/settings.hpp"
@@ -21,13 +22,20 @@ namespace Ui {
 		funcSwitchUi = i_funcSwitchUi;
 
 		playText = TTF_CreateText(textEngine, Font1::sz48, "PLAY", 0);
+		exitText = TTF_CreateText(textEngine, Font1::sz48, "EXIT", 0);
 		hsText = TTF_CreateText(textEngine, Font1::sz18, "HIGH SCORE", 0);
 		noneText = TTF_CreateText(textEngine, Font1::sz18, "None.", 0);
+		creditsText = TTF_CreateText(textEngine, Font2::sz16, CREDITS.data(), 0);
+		linkText = TTF_CreateText(textEngine, Font1::sz12, GITHUB_LINK.data(), 0);
+
+		TTF_SetTextColor(linkText, 0, 0, 238, 255);
 
 		SDL_GetTextureSize(Logo::logoTexture, &logoWidth, &logoHeight);
 
 		logoPos = {(float) w/4, 80, (float) w / 2, logoHeight * w/2 / logoWidth};
 
+		TTF_GetStringSize(Font1::sz12, GITHUB_LINK.data(), 0, &linkWidth, &linkHeight);
+		TTF_GetStringSize(Font2::sz16, "A", 0, &hsW, &creditsHeight);
 		TTF_GetStringSize(Font1::sz18, "HIGH SCORE", 0, &hsW, &th);
 		TTF_GetStringSize(Font1::sz48, "PLAY", 0, &tw, &th);
 
@@ -73,6 +81,17 @@ namespace Ui {
 		
 		TTF_SetTextColor(playText, r, g, b, 255);
 		TTF_DrawRendererText(playText, tx, ty);
+
+
+		// r = g = b = 255;
+		// if(!settingsUi && tx <= mouseX && mouseX <= tx + tw &&
+		// 	ty + th + 48 <= mouseY && mouseY <= ty + th + 48 + th) {
+		// 	r -= 90, g -= 90, b -= 90;
+		// 	pointer = true;
+		// }
+
+		// TTF_SetTextColor(exitText, r, g, b, 255);
+		// TTF_DrawRendererText(exitText, tx, ty + th + 48);
 
 		if(!settingsUi &&
 			settingBtnRect.x <= mouseX && mouseX <= settingBtnRect.x + settingBtnRect.w &&
@@ -219,6 +238,28 @@ namespace Ui {
 				}else {
 					TTF_DrawRendererText(setting_text("CLEAR HIGH SCORES", 255, 255, 255), x, hsY);
 				}
+
+				float cy = hsY + 32;
+				if(cy + 9 * creditsHeight + 32 > rect.y + rect.h) break;
+				TTF_DrawRendererText(creditsText, x, cy);
+
+				cy += 9 * creditsHeight + 32;
+
+				if(cy > rect.y + rect.h) break;
+				TTF_DrawRendererText(linkText, x, cy);
+
+				if(x <= mouseX && mouseX <= x + linkWidth &&
+					cy <= mouseY && mouseY <= cy + linkHeight) {
+					pointer = true;
+					SDL_SetRenderDrawColor(renderer, 100, 100, 238, 255);
+				}else {
+					SDL_SetRenderDrawColor(renderer, 0, 0, 238, 255);
+				}
+
+				SDL_RenderLine(renderer, x, cy + linkHeight, x + linkWidth, cy + linkHeight);
+
+				// prev
+				SDL_SetRenderDrawColor(renderer, 128, 128, 128, 255);
 			}while(false);
 
 			x += 32;
@@ -360,6 +401,14 @@ namespace Ui {
 			funcSwitchUi(Game().id());
 		}
 
+		// if(!settingsUi && tx <= mouseX && mouseX <= tx + tw &&
+		// 	ty + th + 48 <= mouseY && mouseY <= ty + th + 48 + th) {
+		// 	SDL_SetCursor(Cursor::defaultCursor);
+			
+		// 	SDL_Event event { .type = SDL_EVENT_QUIT };
+		//     SDL_PushEvent(&event);
+		// }
+
 		if(!settingsUi &&
 			settingBtnRect.x <= mouseX && mouseX <= settingBtnRect.x + settingBtnRect.w &&
 			settingBtnRect.y <= mouseY && mouseY <= settingBtnRect.y + settingBtnRect.h) {
@@ -482,8 +531,39 @@ namespace Ui {
 					Settings::sfxVolume = std::min<int>(Settings::sfxVolume + 5, 100);
 					Settings::update();
 				}
+
+				float cy = hsY + 32;
+				cy += 9 * creditsHeight + 32;
+
+				if(cy > rect.y + rect.h) break;
+
+				if(x <= mouseX && mouseX <= x + linkWidth &&
+					cy <= mouseY && mouseY <= cy + linkHeight) {
+					std::string platform = SDL_GetPlatform();
+					if(platform == "Windows") {
+						std::string cmd = "explorer " + GITHUB_LINK;
+						system(cmd.data());
+					}else if(platform == "Linux") {
+						std::string cmd = "xdg-open " + GITHUB_LINK;
+						system(cmd.data());
+					}else if(platform == "MacOS") {
+						std::string cmd = "open " + GITHUB_LINK;
+						system(cmd.data());
+					}else {
+						SDL_Log("Open link not available in iOS/Android.");
+					}
+				}
 			}while(false);
 			Settings::save();
+		}
+	}
+
+	void Main::keydown(SDL_Keycode keycode) {
+		if(keycode == SDLK_ESCAPE) {
+			if(settingsUi && !closing) {
+				closing = true;
+				closeTime = SDL_GetTicks();
+			}
 		}
 	}
 
@@ -497,5 +577,8 @@ namespace Ui {
 		TTF_DestroyText(playText);
 		TTF_DestroyText(hsText);
 		TTF_DestroyText(noneText);
+		TTF_DestroyText(exitText);
+		TTF_DestroyText(creditsText);
+		TTF_DestroyText(linkText);
 	}
 }

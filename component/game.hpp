@@ -33,6 +33,16 @@ namespace Ui {
 
 		// Fixed-goal leveling system, every 10 lines, +1 level
 		const int levelLines = 10;
+		const int levelUpShowTime = 1000; // show LEVEL UP
+		const int levelUpEachGlow = 125;
+
+		const int scorePromptTime = 1000;
+
+		std::deque<std::tuple<TTF_Text*, float, float, Uint64>> scorePromptQueue;
+		float promptX, promptY;
+
+		bool levelUp = false;
+		Uint64 levelUpTime = 0;
 
 		unsigned long long dataLevel = 1;
 		unsigned long long dataLines = 0;
@@ -130,6 +140,9 @@ namespace Ui {
 		TTF_Text* retryText;
 		int retryTextSize[2];
 
+		TTF_Text* levelUpText;
+		int levelUpTextSize[2];
+
 		int heldPiece = -1;
 
 		bool retryUi = false;
@@ -146,17 +159,24 @@ namespace Ui {
 
 		// game mechanics
 		void key_tick();
+
 		void new_block();
+
 		void drop(bool force);
 		bool try_move(int dr, int dc);
 		void rotate(int direction);
-		void lose();
+		void calc_ghost();
+
 		void whoosh();
 		void whoosh_tick();
 		void row_drop();
-		void hard_drop();
 		void row_drop_tick();
+		void prompt(const std::string& str);
+		void prompt_tick();
+
+		void hard_drop();
 		void hold();
-		void calc_ghost();
+
+		void lose();
 	};
 }

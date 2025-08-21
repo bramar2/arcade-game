@@ -1,5 +1,9 @@
 #include "f1.hpp"
+#include "SDL3_ttf/SDL_ttf.h"
 
+/*
+  Font: Press Start 2P
+*/
 namespace Font1 {
 	static constexpr unsigned char f1_ttf[] = {
 		0x00, 0x01, 0x00, 0x00, 0x00, 0x0e, 0x00, 0x80, 0x00, 0x03, 0x00, 0x60,
@@ -6878,18 +6882,24 @@ namespace Font1 {
 		0xcc, 0xb6, 0x25, 0x77
 	};
   	static constexpr unsigned int f1_ttf_len = 82480;
+  	TTF_Font* sz12 = nullptr;
   	TTF_Font* sz18 = nullptr;
   	TTF_Font* sz24 = nullptr;
+  	TTF_Font* sz36 = nullptr;
   	TTF_Font* sz48 = nullptr;
 
 	void init() {
-		sz18 = TTF_OpenFontIO(SDL_IOFromConstMem(Font1::f1_ttf, Font1::f1_ttf_len), true, 18.0f);
-		sz24 = TTF_OpenFontIO(SDL_IOFromConstMem(Font1::f1_ttf, Font1::f1_ttf_len), true, 24.0f);
-		sz48 = TTF_OpenFontIO(SDL_IOFromConstMem(Font1::f1_ttf, Font1::f1_ttf_len), true, 48.0f);
+		sz12 = TTF_OpenFontIO(SDL_IOFromConstMem(f1_ttf, f1_ttf_len), true, 12.0f);
+		sz18 = TTF_OpenFontIO(SDL_IOFromConstMem(f1_ttf, f1_ttf_len), true, 18.0f);
+		sz24 = TTF_OpenFontIO(SDL_IOFromConstMem(f1_ttf, f1_ttf_len), true, 24.0f);
+		sz36 = TTF_OpenFontIO(SDL_IOFromConstMem(f1_ttf, f1_ttf_len), true, 36.0f);
+		sz48 = TTF_OpenFontIO(SDL_IOFromConstMem(f1_ttf, f1_ttf_len), true, 48.0f);
 	}
 	void destroy() {
+		TTF_CloseFont(sz12);
 		TTF_CloseFont(sz18);
 		TTF_CloseFont(sz24);
+		TTF_CloseFont(sz36);
 		TTF_CloseFont(sz48);
 	}
 };

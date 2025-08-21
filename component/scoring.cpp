@@ -5,12 +5,12 @@
 #include <cmath>
 
 /*
-  Implementation is using the standard from https://{arcadegame}.wiki/Scoring
+  Implementation is using the standard from https://tetris.wiki/Scoring
 
   Single						100 × level
   Double						300 × level
   Triple						500 × level
-  4 Clear						800 × level; difficult
+  Tetris						800 × level; difficult
   Mini T-Spin no line(s)		100 × level
   T-Spin no line(s)				400 × level
   Mini T-Spin Single			200 × level; difficult
@@ -27,13 +27,13 @@
   Single-line perfect clear	800 × level
   Double-line perfect clear	1200 × level
   Triple-line perfect clear	1800 × level
-  4-line perfect clear 2000 × level
-  Back-to-back 4-line perfect clear	3200 × level
+  Tetris perfect clear	2000 × level
+  Back-to-back Tetris perfect clear	3200 × level
 
 */
 namespace Scoring {
 
-	unsigned long long calculate(std::function<void(std::string)> prompt, int grid[20][10], bool cleared[20], int level, int tSpin,
+	unsigned long long calculate(std::function<void(const std::string&)> prompt, int grid[20][10], bool cleared[20], int level, int tSpin,
     	int& combo, bool& btbDifficult, bool& btb4CPerfectClear) {
 
 		int cnt = 0, nonEmptyCnt = 0;

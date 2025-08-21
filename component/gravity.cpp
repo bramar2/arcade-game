@@ -3,7 +3,7 @@
 #include <cmath>
 
 /*
-  Implementation is adapted from https://{arcadegame}.wiki/Marathon, section Speed curve.
+  Implementation is adapted from https://tetris.wiki/Marathon, section Speed curve.
   Level is capped at 15. Assumes 64 fps.
 
 
