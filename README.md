@@ -2,7 +2,7 @@
 ## Dependencies
 - SDL3
 - SDL3_ttf
-- bramar2/json (custom)
+- bramar2/json (included)
 ## Building
 On root, run the following commands:
 - `cmake -S . -B build/`
