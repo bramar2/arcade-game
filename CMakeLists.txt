@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.27)
-project(informatika)
+project(arcade-game)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_FLAGS "-O3")
@@ -7,7 +7,7 @@ set(CMAKE_CXX_FLAGS "-O3")
 find_package(SDL3 REQUIRED)
 find_package(SDL3_ttf REQUIRED)
 
-add_executable(informatika
+add_executable(arcade-game
 	program.cpp
 
 	json/json.hpp json/input.cpp json/input.hpp
@@ -64,7 +64,7 @@ add_executable(informatika
 	)
 
 if (WIN32)
-    target_link_options(informatika PRIVATE -mwindows)
+    target_link_options(arcade-game PRIVATE -mwindows)
 endif()
 
-target_link_libraries(informatika SDL3::SDL3 SDL3_ttf::SDL3_ttf)
+target_link_libraries(arcade-game SDL3::SDL3 SDL3_ttf::SDL3_ttf)
