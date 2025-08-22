@@ -3,6 +3,7 @@
 #include "json_element.hpp"
 
 #include <vector>
+#include <variant>
 
 namespace json {
 	class JsonPath {

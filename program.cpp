@@ -90,7 +90,7 @@ void app_init() {
     	pr.second->init(window, renderer, textEngine, app_switchUi);
     }
 
-    Settings::init(renderer, "settings.json");
+    Settings::init(renderer, "arcade-game-settings.json");
     Settings::update();
 
     app_render();

@@ -1,0 +1,1 @@
+cmake -S . -B build-win64-static/ -DBUILD_STATIC_APP=ON -DCMAKE_C_COMPILER="C:/mingw64/bin/gcc.exe" -DCMAKE_CXX_COMPILER="C:/mingw64/bin/g++.exe" -DCMAKE_RC_COMPILER="C:/mingw64/bin/windres.exe"

@@ -1,14 +1,67 @@
 cmake_minimum_required(VERSION 3.27)
 project(arcade-game)
 
+cmake_policy(SET CMP0077 NEW)
+
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release)
+endif()
+
 set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_CXX_FLAGS "-O3")
 
-find_package(SDL3 REQUIRED)
-find_package(SDL3_ttf REQUIRED)
+if(BUILD_32BIT)
+  set(CMAKE_CXX_FLAGS "-m32")
+else()
+  set(CMAKE_CXX_FLAGS "")
+endif()
 
-add_executable(arcade-game
-	program.cpp
+set(CMAKE_CXX_FLAGS_DEBUG "-g" CACHE STRING "" FORCE)
+set(CMAKE_CXX_FLAGS_RELEASE "-O3" CACHE STRING "" FORCE)
+
+if(NOT DEFINED BUILD_STATIC_APP)
+  set(BUILD_STATIC_APP ON)
+endif()
+
+if(NOT BUILD_STATIC_APP)
+  message("[arcade-game] Building application in DYNAMIC mode")
+  find_package(SDL3 REQUIRED)
+  find_package(SDL3_ttf REQUIRED)
+  
+  set(SDL_TARGET SDL3::SDL3)
+  set(SDLTTF_TARGET SDL3_ttf::SDL3_ttf)
+else()
+  message("[arcade-game] Building application in STATIC mode")
+  set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+  set(SDL_BUILD_SHARED OFF CACHE BOOL "" FORCE)
+  set(CMAKE_POSITION_INDEPENDENT_CODE ON CACHE BOOL "" FORCE)
+
+  set(SDLTTF_VENDORED ON CACHE BOOL "" FORCE)
+  set(SDLTTF_FREETYPE ON CACHE BOOL "" FORCE)
+  set(SDLTTF_BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+
+  add_subdirectory(external/SDL3 EXCLUDE_FROM_ALL)
+  add_subdirectory(external/SDL3_ttf EXCLUDE_FROM_ALL)
+
+  if(TARGET SDL3::SDL3-static)
+    set(SDL_TARGET SDL3::SDL3-static)
+  elseif(TARGET SDL3::SDL3)
+    set(SDL_TARGET SDL3::SDL3)
+  else()
+    message(FATAL_ERROR "SDL3 target not found")
+  endif()
+  
+  if(TARGET SDL3_ttf::SDL3_ttf-static)
+    set(SDLTTF_TARGET SDL3_ttf::SDL3_ttf-static)
+  elseif(TARGET SDL3_ttf::SDL3_ttf)
+    set(SDLTTF_TARGET SDL3_ttf::SDL3_ttf)
+  else()
+    message(FATAL_ERROR "SDL3_ttf target not found")
+  endif()
+
+endif()
+
+add_executable(arcade-game 
+	program.cpp app_icon.rc
 
 	json/json.hpp json/input.cpp json/input.hpp
 	json/json_array.cpp json/json_array.hpp
@@ -61,10 +114,16 @@ add_executable(arcade-game
 
 	settings/icon.hpp settings/icon.cpp
 	settings/settings.hpp settings/settings.cpp
-	)
+)
 
 if (WIN32)
-    target_link_options(arcade-game PRIVATE -mwindows)
+  if (BUILD_STATIC_APP)
+    target_link_options(arcade-game PRIVATE -mwindows -static -static-libgcc -static-libstdc++)
+  else()
+    target_link_options(arcade-game PRIVATE -mwindows -static-libgcc -static-libstdc++)
+  endif()
 endif()
 
-target_link_libraries(arcade-game SDL3::SDL3 SDL3_ttf::SDL3_ttf)
+
+
+target_link_libraries(arcade-game PRIVATE ${SDL_TARGET} ${SDLTTF_TARGET})

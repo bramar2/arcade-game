@@ -11,6 +11,10 @@
 #include <SDL3/SDL_render.h>
 #include <SDL3_ttf/SDL_ttf.h>
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 namespace Ui {
 
 	static int textHeight;
@@ -541,8 +545,12 @@ namespace Ui {
 					cy <= mouseY && mouseY <= cy + linkHeight) {
 					std::string platform = SDL_GetPlatform();
 					if(platform == "Windows") {
+#ifdef _WIN32
+						ShellExecute(NULL, "open", GITHUB_LINK.data(), NULL, NULL, SW_SHOWNORMAL);
+#else
 						std::string cmd = "explorer " + GITHUB_LINK;
 						system(cmd.data());
+#endif
 					}else if(platform == "Linux") {
 						std::string cmd = "xdg-open " + GITHUB_LINK;
 						system(cmd.data());
@@ -550,7 +558,7 @@ namespace Ui {
 						std::string cmd = "open " + GITHUB_LINK;
 						system(cmd.data());
 					}else {
-						SDL_Log("Open link not available in iOS/Android.");
+						SDL_Log("Open link is not supported for current OS.");
 					}
 				}
 			}while(false);

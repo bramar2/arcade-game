@@ -3,6 +3,7 @@
 #include "json_object.hpp"
 
 #include <iostream>
+
 namespace json {
 
 	JsonPath::JsonPath() {}

@@ -1,0 +1,6 @@
+build-win32-static
+build-win32-dynamic
+build-win64-static
+build-win64-dynamic
+external/SDL3
+external/SDL3_ttf
